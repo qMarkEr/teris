@@ -1,6 +1,8 @@
 #include "render.h"
 #include <curses.h>
 #include <unistd.h>
+#include <time.h>
+#include <stdlib.h>
 #include "controls.h"
 #include "figures.h"
 
@@ -16,20 +18,21 @@ void fld_output(int **frame) {
 }
 
 void fig_output(fld field, fig f, int stop) {
-    for (int i = 0; i < BLOCKS; ++i) {
-        int x = f.blocks[i].x;
-        int y = f.blocks[i].y;
-        if (x >= 0 && y >= 0)
-            field.frame[y][x] = 1;
-    }
-    fld_output(field.frame);
     if (!stop) {
+        for (int i = 0; i < BLOCKS; ++i) {
+            int x = f.blocks[i].x;
+            int y = f.blocks[i].y;
+            if (x >= 0 && y >= 0)
+                field.frame[y][x] = 1;
+        }
+        fld_output(field.frame);
         for (int i = 0; i < BLOCKS; ++i) {
             int x = f.blocks[i].x;
             int y = f.blocks[i].y;
             if (x >= 0 && y >= 0)
                 field.frame[y][x] = 0;
         }
+
     }
 }
 
@@ -44,6 +47,10 @@ void move_down(fld *f, fig *prev, int *stop) {
     }
     if (*stop) {
         for (int j = 0; j < BLOCKS; ++j) {
+            if (prev->blocks[j].y < 0) {
+                *stop = 2;
+                return;
+            }
             f->frame[prev->blocks[j].y][prev->blocks[j].x] = 1;
             if (f->max_y > prev->blocks[j].y)
                 f->max_y = prev->blocks[j].y;
@@ -56,28 +63,45 @@ void move_down(fld *f, fig *prev, int *stop) {
     }
 }
 
-void render(fld *field, fig *f) {
+void render(fld *field) {
+    srand(time(NULL));
+    struct timespec sp_start, sp_end, ts1, ts2 = {0, 0};
     int stop = 0;
-    while (!stop) {
-        int speed = 3;
-        char c = getch();
-        if (c == 'a') {
-            shift(field, -1, f);
+    fig *j;
+    char type = TYPES[rand() % 7];
+    j = figure(type);
+    spawn(j);
+    int ticks = 30;
+    while (stop != 2) {
+        clock_gettime(CLOCK_MONOTONIC, &sp_start);
+        if (stop) {
+            type = TYPES[rand() % 7];
+            j = figure(type);
+            spawn(j);
+            stop = 0;
         }
-        if (c == 'd') {
-            shift(field, 1, f);
+        char action = getch();
+        if (action == 'a')
+            shift(field, -1, j);
+
+        if (action == 'd')
+            shift(field, 1, j);
+
+        if (action == 'w')
+            rotate(field, j);
+
+        if (action == 's')
+            move_down(field, j, &stop);
+
+        if (ticks == 0) {
+            move_down(field, j, &stop);
+            ticks = 30;
         }
-        if (c == 'w') {
-            rotate(field, f);
-        }
-        if (c == 's') {
-            speed = 1;
-        }
-        fig_output(*field, *f, stop);
-        usleep(speed * 100000);
-        move_down(field, f, &stop);
-        fld_output(field->frame);
-        printw("%d", field->max_y);
-        //refresh();
+        fig_output(*field, *j, stop);
+        clock_gettime(CLOCK_MONOTONIC, &sp_end);
+        if (sp_end.tv_sec - sp_start.tv_sec <= 0 &&
+            (ts2.tv_nsec = 16000000 - (sp_end.tv_nsec - sp_start.tv_nsec)) > 0)
+            nanosleep(&ts2, &ts1);
+        ticks--;
     }
 }

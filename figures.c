@@ -100,7 +100,7 @@ void fig_delete(fig *f) {
 }
 
 void clear_layer(fld *f) {
-    for (int i = HEIGHT - 1; i >= f->max_y; --i) {
+    for (int i = HEIGHT - 1; i >= f->max_y;) {
         int flag = 1;
         while (flag) {
             for (int j = 0; j < WIDTH && flag; ++j)
@@ -111,7 +111,9 @@ void clear_layer(fld *f) {
                     for (int j = 0; j < WIDTH; ++j)
                         f->frame[k][j] = f->frame[k - 1][j];
                 }
-                f->max_y--;
+                f->max_y++;
+            } else {
+                i--;
             }
         }
     }

@@ -12,7 +12,7 @@ void fig_output(fld field, fig f, int stop);
 
 void move_down(fld* f, fig *prev, int* stop);
 
-void render(fld *field, fig* f);
+void render(fld *field);
 
 
 #endif //TETRIS_RENDER_H
