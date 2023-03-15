@@ -6,14 +6,20 @@
 #include "controls.h"
 #include "figures.h"
 
-void fld_output(int **frame) {
-    clear();
-    for (int i = 0; i < HEIGHT; ++i) {
-        for (int j = 0; j < WIDTH; ++j) {
-            printw("%s", frame[i][j] == 0 ? ".." : "$$");
+void fld_output(fld f) {
+   // clear();
+    for (int i = 0; i < HEIGHT; i++) {
+        for (int j = 0; j < WIDTH; j++) {
+            mvaddch(i, j, f.frame[i][j] == 0 ? '.' : '$');
         }
-        printw("\n");
+        if (i == 0) {
+            printw("\tScore: %d", f.count);
+        }
+        if (i == 3) {
+            printw("\tHigh score: %d", f.high_count);
+        }
     }
+
     refresh();
 }
 
@@ -25,7 +31,7 @@ void fig_output(fld field, fig f, int stop) {
             if (x >= 0 && y >= 0)
                 field.frame[y][x] = 1;
         }
-        fld_output(field.frame);
+        fld_output(field);
         for (int i = 0; i < BLOCKS; ++i) {
             int x = f.blocks[i].x;
             int y = f.blocks[i].y;

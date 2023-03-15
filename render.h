@@ -6,7 +6,7 @@
 #define WIDTH 10
 #define HEIGHT 20
 
-void fld_output(int **frame);
+void fld_output(fld f);
 
 void fig_output(fld field, fig f, int stop);
 

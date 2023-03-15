@@ -15,6 +15,7 @@ typedef struct figure {
 typedef struct field {
     int **frame;
     int count;
+    int high_count;
     int max_y;
 } fld;
 

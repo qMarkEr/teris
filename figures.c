@@ -1,5 +1,6 @@
 #include "figures.h"
 #include <stdlib.h>
+#include "stdio.h"
 #include "render.h"
 
 fig *figure(char name) {
@@ -80,13 +81,18 @@ fld *init() {
             new->frame[i][j] = 0;
         }
     }
-
+    FILE* file = fopen("score.txt", "r");
+    fscanf(file, "%d", &new->high_count);
+    fclose(file);
     new->count = 0;
     new->max_y = HEIGHT - 1;
     return new;
 }
 
 void fld_delete(fld *game) {
+    FILE* file = fopen("score.txt", "w");
+    fprintf(file, "%d", game->high_count);
+    fclose(file);
     for (int i = 0; i < HEIGHT; ++i) {
         free(game->frame[i]);
     }
@@ -100,6 +106,7 @@ void fig_delete(fig *f) {
 }
 
 void clear_layer(fld *f) {
+    int count = 0;
     for (int i = HEIGHT - 1; i >= f->max_y;) {
         int flag = 1;
         while (flag) {
@@ -112,9 +119,31 @@ void clear_layer(fld *f) {
                         f->frame[k][j] = f->frame[k - 1][j];
                 }
                 f->max_y++;
+                count++;
             } else {
                 i--;
             }
         }
+    }
+    while (count != 0) {
+        if(count - 4 >= 0) {
+            f->count += 1200;
+            count -= 4;
+        } else
+        if (count - 3 >= 0) {
+            f->count += 300;
+            count -= 3;
+        } else
+        if (count - 2 >= 0) {
+            f->count += 100;
+            count -= 2;
+        } else {
+            f->count += 40;
+            count--;
+        }
+
+    }
+    if (f->count > f->high_count) {
+        f->high_count = f->count;
     }
 }
