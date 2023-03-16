@@ -1,113 +1,88 @@
 #include "render.h"
 #include <curses.h>
-#include <unistd.h>
 #include <time.h>
 #include <stdlib.h>
 #include "controls.h"
 #include "figures.h"
 
-void fld_output(fld f) {
-   // clear();
+#define START_SPEED 100
+
+void game_output(fld *f) {
+
     for (int i = 0; i < HEIGHT; i++) {
         for (int j = 0; j < WIDTH; j++) {
-            mvaddch(i, j, f.frame[i][j] == 0 ? '.' : '$');
+            mvaddch(i, j, f->frame[i][j] == 0 ? '.' : '$');
         }
-        if (i == 0) {
-            printw("\tScore: %d", f.count);
+        if (i == 1) {
+            printw("\tScore: %d", f->count);
         }
         if (i == 3) {
-            printw("\tHigh score: %d", f.high_count);
+            printw("\tHigh score: %d", f->high_count);
         }
+        if (i == 5) {
+            printw("\tLevel: %d", f->level);
+        }
+        fig_output(f->next, 0);
     }
 
-    refresh();
 }
 
-void fig_output(fld field, fig f, int stop) {
+
+void fig_output(fig *f, int stop) {
     if (!stop) {
         for (int i = 0; i < BLOCKS; ++i) {
-            int x = f.blocks[i].x;
-            int y = f.blocks[i].y;
+            int x = f->blocks[i].x;
+            int y = f->blocks[i].y;
             if (x >= 0 && y >= 0)
-                field.frame[y][x] = 1;
-        }
-        fld_output(field);
-        for (int i = 0; i < BLOCKS; ++i) {
-            int x = f.blocks[i].x;
-            int y = f.blocks[i].y;
-            if (x >= 0 && y >= 0)
-                field.frame[y][x] = 0;
-        }
-
-    }
-}
-
-void move_down(fld *f, fig *prev, int *stop) {
-    for (int i = 0; i < BLOCKS && !(*stop); ++i) {
-        pnt temp;
-        temp.x = prev->blocks[i].x;
-        temp.y = prev->blocks[i].y + 1;
-        if (temp.y >= HEIGHT || collision(temp, *f)) {
-            *stop = 1;
-        }
-    }
-    if (*stop) {
-        for (int j = 0; j < BLOCKS; ++j) {
-            if (prev->blocks[j].y < 0) {
-                *stop = 2;
-                return;
-            }
-            f->frame[prev->blocks[j].y][prev->blocks[j].x] = 1;
-            if (f->max_y > prev->blocks[j].y)
-                f->max_y = prev->blocks[j].y;
-        }
-        clear_layer(f);
-    } else {
-        for (int i = 0; i < BLOCKS; ++i) {
-            prev->blocks[i].y++;
+                mvaddch(y, x, '$');
         }
     }
 }
 
 void render(fld *field) {
-    srand(time(NULL));
     struct timespec sp_start, sp_end, ts1, ts2 = {0, 0};
     int stop = 0;
-    fig *j;
-    char type = TYPES[rand() % 7];
-    j = figure(type);
-    spawn(j);
-    int ticks = 30;
+    srand(time(NULL));
+    char name = TYPES[rand() % 7];
+    fig *j = figure(name);
+    name = TYPES[rand() % 7];
+    field->next = figure(name);
+    for (int i = 0; i < BLOCKS; ++i) {
+        field->next->blocks[i].x += 12;
+        field->next->blocks[i].y += 10;
+    }
+    int ticks = START_SPEED;
+    int speed;
     while (stop != 2) {
         clock_gettime(CLOCK_MONOTONIC, &sp_start);
         if (stop) {
-            type = TYPES[rand() % 7];
-            j = figure(type);
-            spawn(j);
+            fig_delete(j);
+            j = figure(name);
             stop = 0;
+            for (int i = 0; i < BLOCKS; ++i) {
+                mvaddch(field->next->blocks[i].y, field->next->blocks[i].x,  ' ');
+            }
+            name = TYPES[rand() % 7];
+            field->next = figure(name);
+
+            for (int i = 0; i < BLOCKS; ++i) {
+                field->next->blocks[i].x += 15;
+                field->next->blocks[i].y += 10;
+            }
         }
-        char action = getch();
-        if (action == 'a')
-            shift(field, -1, j);
-
-        if (action == 'd')
-            shift(field, 1, j);
-
-        if (action == 'w')
-            rotate(field, j);
-
-        if (action == 's')
-            move_down(field, j, &stop);
-
+        move_fig(field, j, &stop);
         if (ticks == 0) {
             move_down(field, j, &stop);
-            ticks = 30;
+            ticks = START_SPEED - field->level * 10;
         }
-        fig_output(*field, *j, stop);
+        game_output(field);
+        fig_output(j, stop);
+        refresh();
         clock_gettime(CLOCK_MONOTONIC, &sp_end);
         if (sp_end.tv_sec - sp_start.tv_sec <= 0 &&
-            (ts2.tv_nsec = 16000000 - (sp_end.tv_nsec - sp_start.tv_nsec)) > 0)
+            (ts2.tv_nsec = 5000000 - (sp_end.tv_nsec - sp_start.tv_nsec)) > 0)
             nanosleep(&ts2, &ts1);
         ticks--;
     }
+    fig_delete(j);
 }

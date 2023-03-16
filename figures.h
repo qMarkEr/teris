@@ -2,6 +2,7 @@
 #define TETRIS_FIGURES_H
 #define BLOCKS 4
 #define TYPES "IJLOSTZ"
+
 typedef struct point {
     int x;
     int y;
@@ -17,6 +18,9 @@ typedef struct field {
     int count;
     int high_count;
     int max_y;
+    int lines_cleared;
+    int level;
+    fig* next;
 } fld;
 
 void clear_layer(fld* f);
@@ -31,6 +35,7 @@ void spawn(fig *figure);
 
 fig *figure(char name);
 
-int collision(pnt f, fld field);
+int collision(pnt f, fld *field);
 
+void score(fld* f, int count);
 #endif //TETRIS_FIGURES_H

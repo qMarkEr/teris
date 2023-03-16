@@ -1,9 +1,12 @@
 #include "figures.h"
 #include <stdlib.h>
 #include "stdio.h"
+#include "ncurses.h"
+#include "time.h"
 #include "render.h"
 
 fig *figure(char name) {
+
     fig *res = (fig *) malloc(sizeof(fig));
     res->blocks = (pnt *) malloc(sizeof(pnt) * BLOCKS);
     res->type = name;
@@ -53,6 +56,7 @@ fig *figure(char name) {
         default:
             break;
     }
+    spawn(res);
     return res;
 }
 
@@ -63,10 +67,10 @@ void spawn(fig *figure) {
     }
 }
 
-int collision(pnt f, fld field) {
+int collision(pnt f, fld *field) {
     int flag = 0;
     int i = f.y, j = f.x;
-    if (i >= 0 && (j < 0 || j >= WIDTH || field.frame[i][j] == 1)) {
+    if (i >= 0 && (j < 0 || j >= WIDTH || field->frame[i][j] == 1)) {
         flag = 1;
     }
     return flag;
@@ -81,16 +85,18 @@ fld *init() {
             new->frame[i][j] = 0;
         }
     }
-    FILE* file = fopen("score.txt", "r");
+    FILE *file = fopen("score.txt", "r");
     fscanf(file, "%d", &new->high_count);
     fclose(file);
     new->count = 0;
+    new->lines_cleared = 0;
+    new->level = 0;
     new->max_y = HEIGHT - 1;
     return new;
 }
 
 void fld_delete(fld *game) {
-    FILE* file = fopen("score.txt", "w");
+    FILE *file = fopen("score.txt", "w");
     fprintf(file, "%d", game->high_count);
     fclose(file);
     for (int i = 0; i < HEIGHT; ++i) {
@@ -114,10 +120,9 @@ void clear_layer(fld *f) {
                 if (f->frame[i][j] == 0)
                     flag = 0;
             if (flag) {
-                for (int k = i; k >= f->max_y; --k) {
+                for (int k = i; k >= f->max_y; --k)
                     for (int j = 0; j < WIDTH; ++j)
                         f->frame[k][j] = f->frame[k - 1][j];
-                }
                 f->max_y++;
                 count++;
             } else {
@@ -125,23 +130,29 @@ void clear_layer(fld *f) {
             }
         }
     }
+    f->lines_cleared += count;
+    if (f->lines_cleared >= 10 && f->level < 10) {
+        f->level++;
+        f->lines_cleared -= 10;
+    }
+    score(f, count);
+}
+
+void score(fld *f, int count) {
     while (count != 0) {
-        if(count - 4 >= 0) {
+        if (count - 4 >= 0) {
             f->count += 1200;
             count -= 4;
-        } else
-        if (count - 3 >= 0) {
+        } else if (count - 3 >= 0) {
             f->count += 300;
             count -= 3;
-        } else
-        if (count - 2 >= 0) {
+        } else if (count - 2 >= 0) {
             f->count += 100;
             count -= 2;
         } else {
             f->count += 40;
             count--;
         }
-
     }
     if (f->count > f->high_count) {
         f->high_count = f->count;

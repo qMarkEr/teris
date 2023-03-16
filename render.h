@@ -6,11 +6,9 @@
 #define WIDTH 10
 #define HEIGHT 20
 
-void fld_output(fld f);
+void game_output(fld *f);
 
-void fig_output(fld field, fig f, int stop);
-
-void move_down(fld* f, fig *prev, int* stop);
+void fig_output(fig *f, int stop);
 
 void render(fld *field);
 
