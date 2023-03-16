@@ -21,6 +21,7 @@ typedef struct field {
     int lines_cleared;
     int level;
     fig* next;
+    int play;
 } fld;
 
 void clear_layer(fld* f);

@@ -1,0 +1,19 @@
+
+  ##### #### ##### ####   # #####
+    #   #      #   #   #  # #
+    #   ####   #   ####   # #####
+    #   #      #   #   #  #     #
+    #   ####   #   #    # # #####
+
+    p - play/pause
+    q - quit
+    w - rotate
+    a - move left
+    d - move right
+    s - move down
+
+    press any key to start!
+
+
+
+

@@ -58,6 +58,12 @@ void move_fig(fld *field, fig *f, int *stop) {
         case 's':
             move_down(field, f, stop);
             break;
+        case 'p':
+            field->play = 0;
+            break;
+        case 'q':
+            *stop = 2;
+            break;
         default:
             break;
     }

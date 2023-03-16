@@ -1,8 +1,6 @@
 #include "figures.h"
 #include <stdlib.h>
 #include "stdio.h"
-#include "ncurses.h"
-#include "time.h"
 #include "render.h"
 
 fig *figure(char name) {
@@ -91,6 +89,7 @@ fld *init() {
     new->count = 0;
     new->lines_cleared = 0;
     new->level = 0;
+    new->play = 1;
     new->max_y = HEIGHT - 1;
     return new;
 }
@@ -103,6 +102,7 @@ void fld_delete(fld *game) {
         free(game->frame[i]);
     }
     free(game->frame);
+    fig_delete(game->next);
     free(game);
 }
 

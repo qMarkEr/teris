@@ -12,5 +12,8 @@ void fig_output(fig *f, int stop);
 
 void render(fld *field);
 
+void menu(char* menu);
+
+void next_fig(fld* f, char name, int stop);
 
 #endif //TETRIS_RENDER_H
