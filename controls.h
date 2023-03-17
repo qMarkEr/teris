@@ -9,8 +9,6 @@ void rotate(fld *f, fig *prev);
 
 void move_down(fld* f, fig *prev, int* stop);
 
-int add_figure(fld *field, fig f);
-
 void move_fig(fld *field, fig* f, int *stop);
 
 #endif //TETRIS_CONTROLS_H

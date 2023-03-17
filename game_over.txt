@@ -14,5 +14,5 @@
 
 
 
-    press any key to restart!
+    press p to restart!
     q - quit

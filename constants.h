@@ -1,0 +1,10 @@
+#ifndef TETRIS_CONSTANTS_H
+#define TETRIS_CONSTANTS_H
+
+#define BLOCKS 4
+#define TYPES "IJLOSTZ"
+#define WIDTH 10
+#define HEIGHT 20
+#define START_SPEED 100
+
+#endif //TETRIS_CONSTANTS_H

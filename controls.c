@@ -1,6 +1,7 @@
 #include "controls.h"
 #include "ncurses.h"
-#include "render.h"
+#include "constants.h"
+#include "game_state.h"
 
 void shift(fld *f, int direction, fig *prev) {
     int stop = 0;
@@ -86,19 +87,5 @@ void move_down(fld *f, fig *prev, int *stop) {
             prev->blocks[i].y++;
         }
     }
-}
-
-int add_figure(fld *field, fig f) {
-    int status = 1;
-    for (int j = 0; j < BLOCKS; ++j) {
-        if (f.blocks[j].y < 0) {
-            status = 2;
-            break;
-        }
-        field->frame[f.blocks[j].y][f.blocks[j].x] = 1;
-        if (field->max_y > f.blocks[j].y)
-            field->max_y = f.blocks[j].y;
-    }
-    return status;
 }
 

@@ -1,7 +1,6 @@
 #ifndef TETRIS_FIGURES_H
 #define TETRIS_FIGURES_H
-#define BLOCKS 4
-#define TYPES "IJLOSTZ"
+
 
 typedef struct point {
     int x;
@@ -24,7 +23,7 @@ typedef struct field {
     int play;
 } fld;
 
-void clear_layer(fld* f);
+fig *figure(char name);
 
 fld *init();
 
@@ -32,11 +31,6 @@ void fld_delete(fld *game);
 
 void fig_delete(fig *f);
 
-void spawn(fig *figure);
-
-fig *figure(char name);
-
 int collision(pnt f, fld *field);
 
-void score(fld* f, int count);
 #endif //TETRIS_FIGURES_H

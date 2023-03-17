@@ -2,10 +2,11 @@
 #include <curses.h>
 #include <time.h>
 #include <stdlib.h>
+#include "constants.h"
 #include "controls.h"
 #include "figures.h"
 
-#define START_SPEED 100
+
 
 void game_output(fld *f) {
 

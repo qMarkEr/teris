@@ -1,14 +1,10 @@
-#include <curses.h>
-#include <stdlib.h>
+#include <ncurses.h>
 #include "render.h"
-#include <time.h>
 #include <stdio.h>
-#include <unistd.h>
 #include "figures.h"
 
 
 int main() {
-    srand(time(NULL));
     initscr();
     nodelay(stdscr, TRUE);
     noecho();
@@ -18,16 +14,17 @@ int main() {
     char act = getchar();
     while (act != 'q') {
         clear();
-        fld *main = init();
-        render(main);
-        clear();
-        refresh();
-        menu("game_over.txt");
-        move(14, 4);
-        refresh();
-        printf("your score: %d", main->count);
-        fld_delete(main);
-        usleep(2000000);
+        if (act == 'p') {
+            fld *main = init();
+            render(main);
+            clear();
+            refresh();
+            menu("game_over.txt");
+            move(14, 4);
+            printf("your score: %d", main->count);
+            fld_delete(main);
+            refresh();
+        }
         act = getchar();
     }
     endwin();

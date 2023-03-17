@@ -12,7 +12,7 @@
     d - move right
     s - move down
 
-    press any key to start!
+    press p to start!
 
 
 
