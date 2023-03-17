@@ -1,5 +1,5 @@
 CC=gcc
-SOURCE=main.c controls.c render.c figures.c
+SOURCE=src/main.c src/controls.c src/render.c src/figures.c src/game_state.c
 OUTPUT=built/tetris
 
 all : build
