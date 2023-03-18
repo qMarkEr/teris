@@ -20,6 +20,7 @@ typedef struct field {
     int lines_cleared;
     int level;
     fig* next;
+    fig* current;
     int play;
 } fld;
 

@@ -51,27 +51,34 @@ void render(fld *field) {
     int stop = 0;
     srand(time(NULL));
     char name = TYPES[rand() % 7];
-    fig *j = figure(name);
-    name = TYPES[rand() % 7];
-    next_fig(field, name, stop);
+    if (field->current == NULL) {
+        field->current = figure(name);
+        name = TYPES[rand() % 7];
+        next_fig(field, name, stop);
+    } else {
+        for (int i = 0; i < BLOCKS; ++i) {
+            field->next->blocks[i].x += 8;
+            field->next->blocks[i].y += 10;
+        }    }
+
     int ticks = START_SPEED;
-    while(stop != 2) {
-        while (field->play && stop != 2) {
+    while(stop != GAME_OVER) {
+        while (field->play && stop != GAME_OVER) {
             clock_gettime(CLOCK_MONOTONIC, &sp_start);
-            if (stop) {
-                fig_delete(j);
-                j = figure(name);
+            if (stop == HAS_COLLISION) {
+                fig_delete(field->current);
+                field->current = figure(field->next->type);
                 name = TYPES[rand() % 7];
                 next_fig(field, name, stop);
                 stop = 0;
             }
-            move_fig(field, j, &stop);
+            move_fig(field, &stop);
             if (ticks == 0) {
-                move_down(field, j, &stop);
+                move_down(field, &stop);
                 ticks = START_SPEED - field->level * 10;
             }
             game_output(field);
-            fig_output(j, stop);
+            fig_output(field->current, stop);
             refresh();
             clock_gettime(CLOCK_MONOTONIC, &sp_end);
             if (sp_end.tv_sec - sp_start.tv_sec <= 0 &&
@@ -80,10 +87,9 @@ void render(fld *field) {
             ticks--;
 
         }
-        if(stop != 2 && getchar() == 'p')
+        if(stop != GAME_OVER && getchar() == 'p')
             field->play = 1;
     }
-    fig_delete(j);
 }
 
 void next_fig(fld *field, char name, int stop) {
@@ -98,7 +104,6 @@ void next_fig(fld *field, char name, int stop) {
         field->next->blocks[i].x += 8;
         field->next->blocks[i].y += 10;
     }
-
 }
 
 void menu(char* menu) {

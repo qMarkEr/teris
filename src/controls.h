@@ -3,12 +3,12 @@
 
 #include "figures.h"
 
-void shift(fld *f, int direction, fig *prev);
+void shift(fld *f, int direction);
 
-void rotate(fld *f, fig *prev);
+void rotate(fld *f);
 
-void move_down(fld* f, fig *prev, int* stop);
+void move_down(fld* f, int* stop);
 
-void move_fig(fld *field, fig* f, int *stop);
+void move_fig(fld *field, int *stop);
 
 #endif //TETRIS_CONTROLS_H

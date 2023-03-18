@@ -3,88 +3,89 @@
 #include "constants.h"
 #include "game_state.h"
 
-void shift(fld *f, int direction, fig *prev) {
+void shift(fld *f, int direction) {
     int stop = 0;
     for (int i = 0; i < BLOCKS && !(stop); ++i) {
         pnt temp;
-        temp.x = prev->blocks[i].x + direction;
-        temp.y = prev->blocks[i].y;
+        temp.x = f->current->blocks[i].x + direction;
+        temp.y = f->current->blocks[i].y;
         if (collision(temp, f)) {
-            stop = 1;
+            stop = HAS_COLLISION;
         }
     }
     if (!stop) {
         for (int i = 0; i < BLOCKS; ++i) {
-            prev->blocks[i].x += direction;
+            f->current->blocks[i].x += direction;
         }
     }
 }
 
-void rotate(fld *f, fig *prev) {
-    if (prev->type == 'O') {
+void rotate(fld *f) {
+    if (f->current->type == 'O') {
         return;
     }
-    int shift_x = prev->blocks[0].x;
-    int shift_y = prev->blocks[0].y;
+    int shift_x = f->current->blocks[0].x;
+    int shift_y = f->current->blocks[0].y;
     int stop = 0;
     for (int i = 0; i < BLOCKS && !(stop); ++i) {
         pnt temp;
-        temp.y = prev->blocks[i].x - shift_x + shift_y;
-        temp.x = -(prev->blocks[i].y - shift_y) + shift_x;
+        temp.y = f->current->blocks[i].x - shift_x + shift_y;
+        temp.x = -(f->current->blocks[i].y - shift_y) + shift_x;
         if (collision(temp, f)) {
-            stop = 1;
+            stop = HAS_COLLISION;
         }
     }
     if (!stop) {
         for (int i = 0; i < BLOCKS; ++i) {
-            int x = -(prev->blocks[i].y - shift_y) + shift_x;
-            prev->blocks[i].y = prev->blocks[i].x - shift_x + shift_y;
-            prev->blocks[i].x = x;
+            int x = -(f->current->blocks[i].y - shift_y) + shift_x;
+            f->current->blocks[i].y = f->current->blocks[i].x - shift_x + shift_y;
+            f->current->blocks[i].x = x;
         }
     }
 }
 
-void move_fig(fld *field, fig *f, int *stop) {
+void move_fig(fld *field, int *stop) {
     char action = getch();
     switch (action) {
         case 'a':
-            shift(field, -1, f);
+            shift(field, -1);
             break;
         case 'd':
-            shift(field, 1, f);
+            shift(field, 1);
             break;
         case 'w':
-            rotate(field, f);
+            rotate(field);
             break;
         case 's':
-            move_down(field, f, stop);
+            move_down(field, stop);
             break;
         case 'p':
             field->play = 0;
             break;
         case 'q':
-            *stop = 2;
+            save_state(field);
+            *stop = GAME_OVER;
             break;
         default:
             break;
     }
 }
 
-void move_down(fld *f, fig *prev, int *stop) {
+void move_down(fld *f, int *stop) {
     for (int i = 0; i < BLOCKS && !(*stop); ++i) {
         pnt temp;
-        temp.x = prev->blocks[i].x;
-        temp.y = prev->blocks[i].y + 1;
+        temp.x = f->current->blocks[i].x;
+        temp.y = f->current->blocks[i].y + 1;
         if (temp.y >= HEIGHT || collision(temp, f)) {
-            *stop = 1;
+            *stop = HAS_COLLISION;
         }
     }
     if (*stop) {
-        *stop = add_figure(f, *prev);
+        *stop = add_figure(f);
         clear_layer(f);
     } else {
         for (int i = 0; i < BLOCKS; ++i) {
-            prev->blocks[i].y++;
+            f->current->blocks[i].y++;
         }
     }
 }

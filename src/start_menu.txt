@@ -6,6 +6,7 @@
    \_/ \____/  \_/ \_| \_|\___/\____/
 
     p - play/pause
+    c - continue
     q - quit
     w - rotate
     a - move left

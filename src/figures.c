@@ -90,6 +90,8 @@ fld *init() {
     new->level = 0;
     new->play = 1;
     new->max_y = HEIGHT - 1;
+    new->next = NULL;
+    new->current = NULL;
     return new;
 }
 
@@ -102,6 +104,7 @@ void fld_delete(fld *game) {
     }
     free(game->frame);
     fig_delete(game->next);
+    fig_delete(game->current);
     free(game);
 }
 

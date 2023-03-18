@@ -6,5 +6,7 @@
 #define WIDTH 10
 #define HEIGHT 20
 #define START_SPEED 100
+#define HAS_COLLISION 1
+#define GAME_OVER 2
 
 #endif //TETRIS_CONSTANTS_H
